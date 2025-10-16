@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pursuit OCR Waiver Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quiz-container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+
+        .quiz-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.05) 10px,
+                rgba(255,255,255,0.05) 20px
+            );
+            animation: headerSlide 20s linear infinite;
+        }
+
+        @keyframes headerSlide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .quiz-header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            animation: titleBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes titleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .quiz-header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-container {
+            padding: 30px 50px 10px;
+            background: white;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            height: 100%;
+            width: 0%;
+            transition: width 0.6s ease;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .quiz-content {
+            padding: 50px;
+            min-height: 500px;
+        }
+
+        .question-card {
+            animation: slideInScale 0.6s ease-out;
+        }
+
+        @keyframes slideInScale {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .question-icon {
+            font-size: 120px;
+            text-align: center;
+            margin-bottom: 30px;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .question-text {
+            font-size: 2em;
+            color: #333;
+            text-align: center;
+            margin-bottom: 50px;
+            line-height: 1.4;
+            font-weight: bold;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .option-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 4px solid #dee2e6;
+            border-radius: 25px;
+            padding: 50px 30px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .option-box::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .option-box:hover::before {
+            width: 500px;
+            height: 500px;
+        }
+
+        .option-box:hover {
+            transform: translateY(-15px) scale(1.05);
+            border-color: #667eea;
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e8f5 100%);
+        }
+
+        .option-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .option-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: block;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .option-text {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .option-box.disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .option-box.correct {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-color: #22c55e;
+            animation: correctPulse 0.6s ease-in-out;
+            box-shadow: 0 0 40px rgba(34, 197, 94, 0.6);
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1) rotate(2deg); }
+            75% { transform: scale(1.1) rotate(-2deg); }
+        }
+
+        .option-box.correct::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            color: #22c55e;
+            font-weight: bold;
+            animation: checkmarkAppear 0.6s ease-out forwards;
+            z-index: 10;
+        }
+
+        @keyframes checkmarkAppear {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.3) rotate(10deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .option-box.incorrect {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: #ef4444;
+            animation: incorrectShake 0.6s ease-in-out;
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.6);
+        }
+
+        @keyframes incorrectShake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .option-box.incorrect::after {
+            content: '✗';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            color: #ef4444;
+            font-weight: bold;
+            animation: crossAppear 0.6s ease-out forwards;
+            z-index: 10;
+        }
+
+        @keyframes crossAppear {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.3) rotate(-10deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .feedback {
+            margin-top: 40px;
+            padding: 30px;
+            border-radius: 20px;
+            display: none;
+            animation: feedbackSlide 0.6s ease-out;
+            font-size: 1.2em;
+            line-height: 1.8;
+        }
+
+        @keyframes feedbackSlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 3px solid #22c55e;
+            color: #065f46;
+        }
+
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 3px solid #ef4444;
+            color: #991b1b;
+        }
+
+        .feedback-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: feedbackIconSpin 0.6s ease-out;
+        }
+
+        @keyframes feedbackIconSpin {
+            from {
+                transform: rotate(-360deg) scale(0);
+            }
+            to {
+                transform: rotate(0deg) scale(1);
+            }
+        }
+
+        .next-btn {
+            margin-top: 40px;
+            padding: 20px 60px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            transition: all 0.4s;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .next-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .results-screen {
+            display: none;
+            text-align: center;
+            padding: 50px;
+            animation: resultsAppear 0.8s ease-out;
+        }
+
+        @keyframes resultsAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .results-screen.show {
+            display: block;
+        }
+
+        .results-icon {
+            font-size: 150px;
+            margin-bottom: 30px;
+            animation: resultsIconBounce 1s ease-in-out infinite;
+        }
+
+        @keyframes resultsIconBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .score-display {
+            font-size: 5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 30px 0;
+            animation: scoreCount 1s ease-out;
+        }
+
+        @keyframes scoreCount {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .results-message {
+            font-size: 2em;
+            color: #333;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+
+        .results-summary {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 40px;
+            border-radius: 25px;
+            margin: 40px auto;
+            display: inline-block;
+            min-width: 400px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+            font-size: 1.3em;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .restart-btn {
+            padding: 20px 60px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            margin-top: 30px;
+            transition: all 0.4s;
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(240, 147, 251, 0.6);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            z-index: 9999;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .quiz-header h1 {
+                font-size: 2em;
+            }
+
+            .question-text {
+                font-size: 1.5em;
+            }
+
+            .options-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .option-box {
+                min-height: 150px;
+                padding: 30px 20px;
+            }
+
+            .option-icon {
+                font-size: 60px;
+            }
+
+            .option-text {
+                font-size: 1.2em;
+            }
+
+            .quiz-content {
+                padding: 30px 20px;
+            }
+
+            .results-summary {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>🏃‍♂️ Pursuit OCR Quiz</h1>
+            <p>Test Your Waiver Knowledge</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-info">
+                <span id="currentQ">Question 1 of 10</span>
+                <span id="scoreDisplay">Score: 0/10</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="quiz-content" id="quizContent"></div>
+
+        <div class="results-screen" id="resultsScreen">
+            <div class="results-icon" id="resultsEmoji">🎉</div>
+            <h2 class="results-message" id="resultsMessage">Quiz Complete!</h2>
+            <div class="score-display" id="finalScore">0/10</div>
+            <div class="results-summary">
+                <div class="summary-item">
+                    <span>Correct Answers:</span>
+                    <span class="summary-value" id="correctCount">0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Incorrect Answers:</span>
+                    <span class="summary-value" id="incorrectCount">0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Score Percentage:</span>
+                    <span class="summary-value" id="percentage">0%</span>
+                </div>
+            </div>
+            <button class="restart-btn" onclick="location.reload()">🔄 Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Is Pursuit OCR strictly a 15+ facility?",
+                icon: "🔞",
+                options: [
+                    { text: "Yes", icon: "✓", correct: true },
+                    { text: "No", icon: "✗", correct: false }
+                ],
+                correctMsg: "🎯 Correct! Pursuit OCR is strictly a 15+ facility. No exceptions!",
+                incorrectMsg: "❌ Incorrect! Pursuit OCR is strictly a 15+ facility. Anyone under 15 cannot participate."
+            },
+            {
+                question: "Can guests under 18 visit alone without a parent or guardian?",
+                icon: "👨‍👩‍👧",
+                options: [
+                    { text: "Yes", icon: "✓", correct: false },
+                    { text: "No", icon: "✗", correct: true }
+                ],
+                correctMsg: "🎯 Correct! All guests under 18 MUST be accompanied by their parent or legal guardian.",
+                incorrectMsg: "❌ Incorrect! Guests under 18 must be accompanied by their parent or legal guardian at all times."
+            },
+            {
+                question: "Is there a ZERO TOLERANCE policy for alcohol and drugs?",
+                icon: "🚫",
+                options: [
+                    { text: "Yes", icon: "✓", correct: true },
+                    { text: "No", icon: "✗", correct: false }
+                ],
+                correctMsg: "🎯 Correct! ZERO TOLERANCE! Any violation results in immediate termination with NO REFUND.",
+                incorrectMsg: "❌ Incorrect! There is a strict ZERO TOLERANCE policy. Violation = immediate termination, NO REFUND."
+            },
+            {
+                question: "Are closed-toe, lace-up athletic shoes mandatory?",
+                icon: "👟",
+                options: [
+                    { text: "Yes", icon: "✓", correct: true },
+                    { text: "No", icon: "✗", correct: false }
+                ],
+                correctMsg: "🎯 Correct! Only fully closed-toe, lace-up athletic shoes are permitted. Entry may be denied otherwise.",
+                incorrectMsg: "❌ Incorrect! Closed-toe, lace-up athletic shoes are MANDATORY. No slides, Crocs, or boots allowed!"
+            },
+            {
+                question: "Can you get a refund within 72 hours of your appointment?",
+                icon: "💰",
+                options: [
+                    { text: "Yes", icon: "✓", correct: false },
+                    { text: "No", icon: "✗", correct: true }
+                ],
+                correctMsg: "🎯 Correct! All sales are final within 72 hours. No refunds during this timeframe.",
+                incorrectMsg: "❌ Incorrect! There are NO refunds within 72 hours of your scheduled appointment. All sales are final."
+            },
+            {
+                question: "Can participation result in serious injury or death?",
+                icon: "⚠️",
+                options: [
+                    { text: "Yes", icon: "✓", correct: true },
+                    { text: "No", icon: "✗", correct: false }
+                ],
+                correctMsg: "🎯 Correct! The waiver clearly states risks include fractures, brain damage, paralysis, and death.",
+                incorrectMsg: "❌ Incorrect! Participation involves serious risks including fractures, heart attack, brain damage, paralysis, and death."
+            },
+            {
+                question: "By signing, do you give up the right to sue for injuries?",
+                icon: "⚖️",
+                options: [
+                    { text: "Yes", icon: "✓", correct: true },
+                    { text: "No", icon: "✗", correct: false }
+                ],
+                correctMsg: "🎯 Correct! You waive the right to sue, even for injuries caused by negligence.",
+                incorrectMsg: "❌ Incorrect! By signing, you give up substantial rights including the right to sue for injuries, even from negligence."
+            },
+            {
+                question: "Must all guests 18+ present government-issued photo ID?",
+                icon: "🪪",
+                options: [
+                    { text: "Yes", icon: "✓", correct: true },
+                    { text: "No", icon: "✗", correct: false }
+                ],
+                correctMsg: "🎯 Correct! All guests 18+ must present matching government-issued photo ID.",
+                incorrectMsg: "❌ Incorrect! Government-issued photo ID is REQUIRED for all guests 18 and older."
+            },
+            {
+                question: "Can Pursuit OCR use photos/videos of you for promotion?",
+                icon: "📸",
+                options: [
+                    { text: "Yes", icon: "✓", correct: true },
+                    { text: "No", icon: "✗", correct: false }
+                ],
+                correctMsg: "🎯 Correct! By signing, you grant unlimited permission to use your image for promotional purposes.",
+                incorrectMsg: "❌ Incorrect! The waiver grants unlimited permission to use photos/videos of you for promotion."
+            },
+            {
+                question: "Must you report ALL accidents/injuries, even minor ones?",
+                icon: "🚨",
+                options: [
+                    { text: "Yes", icon: "✓", correct: true },
+                    { text: "No", icon: "✗", correct: false }
+                ],
+                correctMsg: "🎯 Correct! You must report ALL accidents and injuries, no matter how minor they appear.",
+                incorrectMsg: "❌ Incorrect! You MUST report all accidents and injuries, no matter how minor, on the day they occur."
+            }
+        ];
+
+        let currentQ = 0;
+        let score = 0;
+        let answered = false;
+
+        function init() {
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQ];
+            const content = document.getElementById('quizContent');
+            
+            content.innerHTML = `
+                <div class="question-card">
+                    <div class="question-icon">${q.icon}</div>
+                    <h2 class="question-text">${q.question}</h2>
+                    <div class="options-container">
+                        <div class="option-box" onclick="answer(0)">
+                            <div class="option-content">
+                                <span class="option-icon">${q.options[0].icon}</span>
+                                <div class="option-text">${q.options[0].text}</div>
+                            </div>
+                        </div>
+                        <div class="option-box" onclick="answer(1)">
+                            <div class="option-content">
+                                <span class="option-icon">${q.options[1].icon}</span>
+                                <div class="option-text">${q.options[1].text}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                    <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">
+                        ${currentQ === questions.length - 1 ? '🏆 See Results' : '➡️ Next Question'}
+                    </button>
+                </div>
+            `;
+
+            updateProgress();
+            answered = false;
+        }
+
+        function answer(index) {
+            if (answered) return;
+            answered = true;
+
+            const q = questions[currentQ];
+            const boxes = document.querySelectorAll('.option-box');
+            const feedback = document.getElementById('feedback');
+            const isCorrect = q.options[index].correct;
+
+            boxes.forEach(box => box.classList.add('disabled'));
+
+            if (isCorrect) {
+                score++;
+                boxes[index].classList.add('correct');
+                feedback.className = 'feedback correct show';
+                feedback.innerHTML = `<div class="feedback-icon">🎉</div><div>${q.correctMsg}</div>`;
+                makeConfetti();
+            } else {
+                boxes[index].classList.add('incorrect');
+                boxes.forEach((box, i) => {
+                    if (q.options[i].correct) {
+                        setTimeout(() => box.classList.add('correct'), 300);
+                    }
+                });
+                feedback.className = 'feedback incorrect show';
+                feedback.innerHTML = `<div class="feedback-icon">💔</div><div>${q.incorrectMsg}</div>`;
+            }
+
+            document.getElementById('scoreDisplay').textContent = `Score: ${score}/${questions.length}`;
+            
+            setTimeout(() => {
+                document.getElementById('nextBtn').style.display = 'block';
+            }, 800);
+        }
+
+        function makeConfetti() {
+            const colors = ['#f093fb', '#f5576c', '#4ade80', '#667eea', '#ffd700'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + '%';
+                    c.style.top = '-10px';
+                    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    c.style.animation = `confettiFall ${Math.random() * 2 + 2}s linear forwards`;
+                    document.body.appendChild(c);
+                    setTimeout(() => c.remove(), 4000);
+                }, i * 30);
+            }
+        }
+
+        function nextQ() {
+            currentQ++;
+            if (currentQ < questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateProgress() {
+            const pct = (currentQ / questions.length) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('currentQ').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+        }
+
+        function showResults() {
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('quizContent').style.display = 'none';
+            document.getElementById('resultsScreen').classList.add('show');
+
+            const pct = Math.round((score / questions.length) * 100);
+            
+            document.getElementById('finalScore').textContent = `${score}/${questions.length}`;
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('incorrectCount').textContent = questions.length - score;
+            document.getElementById('percentage').textContent = pct + '%';
+
+            let emoji = '🎉';
+            let msg = '';
+            
+            if (pct === 100) {
+                emoji = '🏆';
+                msg = 'Perfect Score! You\'re ready for Pursuit OCR!';
+                makeConfetti();
+            } else if (pct >= 80) {
+                emoji = '⭐';
+                msg = 'Great Job! You understand the rules well!';
+            } else if (pct >= 60) {
+                emoji = '👍';
+                msg = 'Good Effort! Review the waiver again.';
+            } else {
+                emoji = '📖';
+                msg = 'Please review the waiver carefully.';
+            }
+
+            document.getElementById('resultsEmoji').textContent = emoji;
+            document.getElementById('resultsMessage').textContent = msg;
+        }
+
+        init();
+    </script>
+</body>
+</html>
