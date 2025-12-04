@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pursuit OCR - Check-in Complete</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* CSS STYLES */
+
+        /* Custom Fonts and Variables */
+        :root {
+            --primary-color: #A9438F; /* Pink/Purple */
+            --bg-light: #f8f9fa;
+            --text-dark: #333;
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: var(--bg-light); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Utility Classes */
+        .btn-action {
+            width: 100%;
+            padding: 15px 25px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-align: center;
+            transition: background-color 0.3s, opacity 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-action:hover {
+            opacity: 0.9;
+        }
+
+        /* Confirmation Container */
+        #confirmationContainer {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .completion-icon {
+            color: var(--primary-color);
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 30px;
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .qr-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .qr-section p {
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: var(--text-dark);
+        }
+        
+        .qr-code {
+            /* Placeholder for the QR code image */
+            width: 200px;
+            height: 200px;
+            background-color: #eee;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        /* Specific Button Icons */
+        .btn-primary i {
+            margin-right: 8px;
+        }
+        
+        .btn-secondary i {
+            margin-right: 8px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            #confirmationContainer {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="confirmationContainer">
+        
+        <i class="fas fa-check-circle completion-icon"></i>
+        
+        <h2>Thank you for completing our Check-in form</h2>
+        
+        <p>Please check your email for important information that you will need on the day of your visit.</p>
+        
+        <button class="btn-action btn-primary" id="bookTicketsBtn">
+            <i class="fas fa-book-open"></i> Book Tickets
+        </button>
+
+        <button class="btn-action btn-secondary" id="checkInAnotherBtn">
+            <i class="fas fa-user-plus"></i> Check in another guest
+        </button>
+
+        <button class="btn-action btn-secondary" id="shareLinkBtn">
+            <i class="fas fa-share-alt"></i> Share this link
+        </button>
+
+        <div class="qr-section">
+            <p>Let your friends scan this QR code to open the waiver on their own device:</p>
+            <div class="qr-code">
+                [QR Code Placeholder]
+                </div>
+        </div>
+    </div>
+
+
+    <script>
+        // JAVASCRIPT LOGIC
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const bookTicketsBtn = document.getElementById('bookTicketsBtn');
+            const checkInAnotherBtn = document.getElementById('checkInAnotherBtn');
+            const shareLinkBtn = document.getElementById('shareLinkBtn');
+
+            // Example Click Handlers (Replace with actual navigation logic)
+            
+            bookTicketsBtn.onclick = function() {
+                alert('Navigating to the ticketing page...');
+                window.location.href = 'https://feverup.com/m/485979'; 
+            };
+
+            checkInAnotherBtn.onclick = function() {
+                alert('Redirecting to the start of the waiver process for a new guest...');
+                window.location.href = 'waiver.html'; // Or modal initiation
+            };
+            
+            shareLinkBtn.onclick = function() {
+                // In a real application, this would use the Web Share API or copy the URL
+                const waiverLink = window.location.href; // Using current page for example
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Pursuit OCR Waiver',
+                        text: 'Complete your waiver for Pursuit OCR here:',
+                        url: waiverLink,
+                    }).catch((error) => console.log('Error sharing:', error));
+                } else if (navigator.clipboard) {
+                    navigator.clipboard.writeText(waiverLink)
+                        .then(() => alert('Waiver link copied to clipboard!'))
+                        .catch(err => console.error('Could not copy text: ', err));
+                } else {
+                    alert('Waiver Link: ' + waiverLink); 
+                }
+            };
+        });
+    </script>
+</body>
+</html>

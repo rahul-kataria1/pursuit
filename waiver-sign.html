@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pursuit OCR - Sign Waiver</title>
+    
+    <style>
+        /* CSS STYLES */
+
+        /* Custom Fonts and Variables */
+        :root {
+            --primary-color: #A9438F; /* Pink/Purple */
+            --bg-light: #f8f9fa;
+            --text-dark: #333;
+            --border-color: #ccc;
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: var(--bg-light); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* The body width is slightly constrained to mimic the slide/modal effect */
+        }
+
+        /* Main Waiver Signing Container (Mimics the central slide area) */
+        #signingContainer {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 700px; /* Wider to accommodate signature pad */
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+            margin: 20px;
+        }
+
+        .header-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin: 0 3px;
+            cursor: pointer;
+        }
+        
+        /* Simulating the currently active progress dot (assuming this is the final step before quiz) */
+        .progress-dot.active {
+            background-color: var(--primary-color);
+        }
+
+        h3 {
+            font-size: 1.2em;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        /* Signature Area */
+        #signaturePadCanvas {
+            flex-grow: 1;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            /* Placeholder styling to show the area */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: crosshair;
+        }
+        
+        #signatureInstructions {
+            position: absolute;
+            font-size: 3em;
+            color: #ccc;
+            user-select: none;
+            pointer-events: none; /* Allows clicks to pass through to the canvas */
+        }
+
+        /* Footer/Navigation Button */
+        .footer-nav {
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-next {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+        }
+
+        .btn-next:hover {
+            background-color: #923a7e;
+        }
+
+        .btn-next:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="signingContainer">
+        
+        <div class="header-controls">
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot active"></div> 
+            <div class="progress-dot"></div> 
+        </div>
+
+        <h3>Please sign below</h3>
+        
+        <canvas id="signaturePadCanvas" width="660" height="350">
+            <span id="signatureInstructions">✍️</span>
+        </canvas>
+        
+        <div class="footer-nav">
+            <button class="btn-next" id="nextButton" disabled>Next</button>
+        </div>
+    </div>
+
+
+    <script>
+        // JAVASCRIPT LOGIC for basic signature pad simulation
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('signaturePadCanvas');
+            const instructions = document.getElementById('signatureInstructions');
+            const nextButton = document.getElementById('nextButton');
+            const ctx = canvas.getContext('2d');
+            
+            let drawing = false;
+            let signatureDrawn = false;
+
+            // Setup canvas context
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#333';
+
+            function startDrawing(e) {
+                drawing = true;
+                ctx.beginPath();
+                draw(e);
+            }
+
+            function stopDrawing() {
+                drawing = false;
+                ctx.closePath();
+                // After finishing a stroke, if we've drawn anything, activate the button
+                if (signatureDrawn) {
+                    nextButton.disabled = false;
+                    instructions.style.display = 'none'; // Hide instructions once signing starts
+                }
+            }
+
+            function draw(e) {
+                if (!drawing) return;
+
+                // Get mouse or touch coordinates relative to the canvas
+                const rect = canvas.getBoundingClientRect();
+                let x, y;
+
+                if (e.touches) {
+                    x = e.touches[0].clientX - rect.left;
+                    y = e.touches[0].clientY - rect.top;
+                } else {
+                    x = e.clientX - rect.left;
+                    y = e.clientY - rect.top;
+                }
+                
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                signatureDrawn = true; // Mark that a signature has been attempted
+            }
+            
+            // Event Listeners for Mouse/Pen
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            canvas.addEventListener('mousemove', draw);
+            
+            // Event Listeners for Touch (Mobile)
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Prevent scrolling/default touch behavior
+                startDrawing(e);
+            });
+            canvas.addEventListener('touchend', stopDrawing);
+            canvas.addEventListener('touchcancel', stopDrawing);
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault(); // Prevent scrolling
+                draw(e);
+            });
+            
+            nextButton.onclick = function() {
+                if (!nextButton.disabled) {
+                    alert('Signature captured! Redirecting to Confirmation page...');
+                    window.location.href = 'book-now.html';
+                }
+            };
+            
+            // Initial instruction positioning
+            instructions.style.top = (canvas.height / 2) + 'px';
+            instructions.style.left = (canvas.width / 2) + 'px';
+            instructions.style.transform = 'translate(-50%, -50%)';
+        });
+    </script>
+</body>
+</html>

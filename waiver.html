@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pursuit OCR - Waiver</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* CSS STYLES */
+
+        /* Custom Fonts and Variables */
+        :root {
+            --primary-color: #A9438F; /* Purple/Pink */
+            --secondary-color: #6c757d; /* Gray */
+            --accent-green: #38c172; /* Available dot */
+            --bg-light: #f8f9fa;
+            --bg-dark: #343a40;
+            --text-light: #fff;
+            --text-dark: #333;
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: var(--bg-light); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Utility Classes */
+        .btn-main {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s;
+        }
+
+        .btn-main:hover {
+            background-color: #923a7e;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 40px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+        
+        /* Standalone Page Container */
+        #waiverMainContainer {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            /* Ensure it is visible by default for the standalone page */
+            display: block !important; 
+        }
+
+        /* MODAL STYLES (Waiver Slides) */
+        #slidesModal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background-color: var(--text-light);
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content.large-content {
+            max-width: 95%;
+            margin: 5% auto;
+            height: 90%;
+        }
+
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .waiver-header .logo-text {
+            font-size: 2em;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .waiver-header .logo-text strong {
+            color: var(--text-dark);
+        }
+
+        .waiver-header h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .waiver-header p {
+            margin-bottom: 20px;
+        }
+
+        /* Waiver Slides */
+        .slide-container {
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .waiver-slide {
+            width: 100%;
+            height: 100%;
+            display: none; /* Controlled by JS */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 0 40px;
+        }
+
+        /* Slide 0 (Welcome/Buttons) specific styling */
+        #slide-0 {
+            padding: 50px 0;
+        }
+        .slide-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+        }
+        .slide-center p {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .slide-actions button {
+            margin: 0 10px;
+        }
+
+        /* Content Slides (1-5) Styling */
+        .slide-card {
+            background-color: var(--bg-light);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .slide-card.full-width {
+            max-width: 500px;
+        }
+
+        .slide-card h3 {
+            color: var(--primary-color);
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .slide-card .card-body {
+            display: flex;
+            gap: 20px;
+            padding: 0;
+        }
+
+        .icon-box {
+            min-width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background-color: #ffe6e6; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+            border: 3px solid var(--primary-color);
+        }
+        .icon-box.check { background-color: #d4edda; color: var(--accent-green); border-color: var(--accent-green);}
+        .icon-box.waiver { background-color: #e6f7ff; color: #007bff; border-color: #007bff; font-size: 1em; padding: 5px; }
+        .icon-box.no-drugs { background-color: #ffe6e6; color: #dc3545; border-color: #dc3545; }
+        .icon-box.footwear { background-color: #fff3cd; color: #ffc107; border-color: #ffc107; }
+        .icon-box.early-arrive { background-color: #d1ecf1; color: #17a2b8; border-color: #17a2b8; }
+        .icon-box.risk { background-color: #fff333; color: #ffc107; border-color: #ffc107; }
+        .icon-box.media { background-color: #d1ecf1; color: #17a2b8; border-color: #17a2b8; }
+        .icon-box.no-refunds { background-color: #ffe6e6; color: #dc3545; border-color: #dc3545; }
+
+        .important-box {
+            background-color: #333;
+            color: var(--text-light);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .important-box i {
+            color: #f0ad4e; /* Warning color */
+            margin-right: 8px;
+        }
+
+        .slide-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            z-index: 30;
+            opacity: 0.8;
+        }
+
+        .slide-nav-btn.prev-btn {
+            left: 10px;
+        }
+
+        .slide-nav-btn.next-btn {
+            right: 10px;
+        }
+
+        .slide-progress {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            left: 0;
+        }
+
+        .slide-progress::after {
+            content: '.......';
+            font-size: 2em;
+            color: #ccc;
+            letter-spacing: 5px;
+        }
+        
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="waiverMainContainer">
+        <div id="waiverWelcomeScreen" class="waiver-header">
+            <div class="logo-text">PURSUIT OCR</div>
+            <h2>Welcome</h2>
+            <p>Please make sure you carefully read and understand the following before submitting.</p>
+            <p>Guests 18+ year old and older must read and sign their OWN waiver.</p>
+            <button class="btn-main" id="getStarted">Get Started</button>
+        </div>
+    </div>
+
+    <div id="slidesModal" class="modal">
+        <div class="modal-content large-content">
+            <span class="close-btn" id="closeSlides">&times;</span> 
+            
+            <div class="slide-container">
+                
+                <div class="waiver-slide" id="slide-0">
+                    <div class="slide-center">
+                        <p>First time user?</p>
+                        <div class="slide-actions">
+                            <button class="btn-secondary" id="firstTimeYes">Yes</button>
+                            <button class="btn-secondary" id="firstTimeNo">No</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="waiver-slide" id="slide-1">
+                    <div class="slide-progress"></div>
+                    <div class="slide-card">
+                        <h3>Age Requirements</h3>
+                        <div class="card-body">
+                            <div class="icon-box">15+</div>
+                            <p>Pursuit OCR is strictly a **15+ facility**. All guests under 18 must be accompanied by their Parent or Legal Guardian signing the waiver. All guests 18 or older must present matching government issued ID.</p>
+                            <div class="important-box"><i class="fas fa-exclamation-triangle"></i> **Important** When listing the Parent/Legal Guardian on a minor’s waiver, please enter their legal name exactly as it appears on their own waiver.</div>
+                        </div>
+                    </div>
+                    <div class="slide-card">
+                        <h3>Valid ID Required</h3>
+                        <div class="card-body">
+                            <div class="icon-box check"><i class="fas fa-check"></i></div>
+                            <p>All guests aged 18 and above must present a valid, government-issued photo ID upon arrival. This helps verify waiver completion and ensure smooth check-in.</p>
+                            <div class="important-box"><i class="fas fa-exclamation-triangle"></i> **Important** Name on your ID must match your waiver exactly to confirm entry.</div>
+                        </div>
+                    </div>
+                    <button class="slide-nav-btn next-btn" onclick="nextSlide()">></button>
+                </div>
+
+                <div class="waiver-slide" id="slide-2">
+                    <div class="slide-progress"></div>
+                     <div class="slide-card">
+                        <h3>Waiver Mandatory</h3>
+                        <div class="card-body">
+                            <div class="icon-box waiver">Waiver</div>
+                            <p>Every participant must complete their own waiver before taking part in any Pursuit OCR activity. This ensures you understand the terms and safety requirements before entry.</p>
+                            <div class="important-box"><i class="fas fa-exclamation-triangle"></i> **Important** For group bookings, each guest must submit a separate waiver under their own name.</div>
+                        </div>
+                    </div>
+                    <div class="slide-card">
+                        <h3>No Drugs or Alcohol</h3>
+                        <div class="card-body">
+                            <div class="icon-box no-drugs"><i class="fas fa-ban"></i></div>
+                            <p>All guests must be free of alcohol, cannabis & any recreational drugs to enter and must remain so throughout the entire duration of your visit. Any violation of this rule will result in the immediate termination of your entire party's visit with no refund.</p>
+                            <div class="important-box"><i class="fas fa-exclamation-triangle"></i> **Important** Anyone found under the influence will be denied entry or asked to leave immediately with no refund.</div>
+                        </div>
+                    </div>
+                    <button class="slide-nav-btn next-btn" onclick="nextSlide()">></button>
+                    <button class="slide-nav-btn prev-btn" onclick="prevSlide()"><</button>
+                </div>
+
+                <div class="waiver-slide" id="slide-3">
+                    <div class="slide-progress"></div>
+                     <div class="slide-card">
+                        <h3>Proper Footwear</h3>
+                        <div class="card-body">
+                            <div class="icon-box footwear"><i class="fas fa-shoe-prints"></i></div>
+                            <p>Athletic shoes that are closed-toe and lace-up are mandatory. Entry may be denied for wearing slides, boots, Crocs, or heels. Wear comfortable clothing that allows free movement.</p>
+                            <div class="important-box"><i class="fas fa-exclamation-triangle"></i> **Important** Barefoot or socks-only participation is not allowed.</div>
+                        </div>
+                    </div>
+                    <div class="slide-card">
+                        <h3>Arrive Early</h3>
+                        <div class="card-body">
+                            <div class="icon-box early-arrive"><i class="fas fa-bell"></i></div>
+                            <p>To make sure you have enough time to check in and get ready, we suggest arriving **10-15 minutes** before your scheduled start time. If you booked a regular public session, this experience may allow date changes up to 48 hours in advance.</p>
+                            <div class="important-box"><i class="fas fa-exclamation-triangle"></i> **Important** Complete your waiver and ID verification before entering and Buying tickets online helps avoid delays during busy hours.</div>
+                        </div>
+                    </div>
+                    <button class="slide-nav-btn next-btn" onclick="nextSlide()">></button>
+                    <button class="slide-nav-btn prev-btn" onclick="prevSlide()"><</button>
+                </div>
+
+                <div class="waiver-slide" id="slide-4">
+                    <div class="slide-progress"></div>
+                     <div class="slide-card">
+                        <h3>Inherit Risk</h3>
+                        <div class="card-body">
+                            <div class="icon-box risk"><i class="fas fa-exclamation-circle"></i></div>
+                            <p>Participation involves physical activity and **inherent risk**. Proceed only if you are in good health and understand the risks involved.</p>
+                            <div class="important-box"><i class="fas fa-exclamation-triangle"></i> **Important** Participation is voluntary and at your own risk.</div>
+                        </div>
+                    </div>
+                    <div class="slide-card">
+                        <h3>Media Notice</h3>
+                        <div class="card-body">
+                            <div class="icon-box media"><i class="fas fa-camera"></i></div>
+                            <p>Photos and videos may be taken during your visit for promotional use. By signing the waiver, you grant permission to Pursuit OCR to use this media.</p>
+                            <div class="important-box"><i class="fas fa-exclamation-triangle"></i> **Important** Speak to staff if you have privacy concerns.</div>
+                        </div>
+                    </div>
+                    <button class="slide-nav-btn next-btn" onclick="nextSlide()">></button>
+                    <button class="slide-nav-btn prev-btn" onclick="prevSlide()"><</button>
+                </div>
+
+                <div class="waiver-slide" id="slide-5">
+                    <div class="slide-progress"></div>
+                     <div class="slide-card full-width">
+                        <h3>No Refunds</h3>
+                        <div class="card-body">
+                            <div class="icon-box no-refunds"><i class="fas fa-money-bill-alt"></i></div>
+                            <p>All bookings are **final and non-refundable**, including missed or canceled sessions. This helps us manage time slots fairly and keep sessions running smoothly.</p>
+                            <div class="important-box"><i class="fas fa-exclamation-triangle"></i> **Important** Please arrive early and double-check your booking details before purchase.</div>
+                        </div>
+                    </div>
+                    <button class="slide-nav-btn next-btn next-step" onclick="nextSlide()">Next</button>
+                    <button class="slide-nav-btn prev-btn" onclick="prevSlide()"><</button>
+                </div>
+
+                <div class="waiver-slide" id="slide-6">
+                    <div class="slide-center">
+                        <p>Completing this quiz now reduces your onboarding time when you arrive</p>
+                        <a href="quiz.html" class="btn-main" style="text-decoration:none">Start Quiz</a>
+                    </div>
+                    <button class="slide-nav-btn prev-btn" onclick="prevSlide()"></button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // JAVASCRIPT LOGIC
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const waiverMainContainer = document.getElementById('waiverMainContainer');
+            const slidesModal = document.getElementById('slidesModal');
+            const getStartedBtn = document.getElementById('getStarted');
+            const closeSlidesBtn = document.getElementById('closeSlides');
+            const slides = document.querySelectorAll('.waiver-slide');
+            let currentSlide = 0;
+
+            // Function to show the current slide
+            window.showSlide = function(n) {
+                slides.forEach(s => s.style.display = 'none');
+                
+                // Clamp the slide index
+                if (n >= slides.length) {
+                    currentSlide = slides.length - 1;
+                } else if (n < 0) {
+                    currentSlide = 0;
+                } else {
+                    currentSlide = n;
+                }
+
+                slides[currentSlide].style.display = 'flex';
+                updateSlideProgress();
+            }
+            
+            // Function to handle progress bar visibility
+            function updateSlideProgress() {
+                const prevBtn = slidesModal.querySelector('.prev-btn');
+                const nextBtn = slidesModal.querySelector('.next-btn');
+                
+                // Show/Hide Nav Buttons
+                if (prevBtn) prevBtn.style.display = (currentSlide > 0 && currentSlide <= 6) ? 'block' : 'none';
+                // Show 'Next' unless on the final quiz slide
+                if (nextBtn) nextBtn.style.display = (currentSlide < 6 && currentSlide > 0) ? 'block' : 'none';
+                
+                // Handle Slide 0 (initial state) navigation
+                if (currentSlide === 0) {
+                    // Hide arrows on the first decision slide (Yes/No)
+                    if (prevBtn) prevBtn.style.display = 'none';
+                    if (nextBtn) nextBtn.style.display = 'none';
+                }
+                
+                // Show 'Next' on slide 5 (before the quiz slide 6)
+                if (currentSlide === 5) {
+                    if (nextBtn) nextBtn.style.display = 'block';
+                }
+            }
+
+            // Start slides from initial container
+            getStartedBtn.onclick = function() {
+                waiverMainContainer.style.display = 'none';
+                slidesModal.style.display = 'flex';
+                showSlide(0);
+            }
+            
+            // Handle 'Yes'/'No' for "First time user?" on Slide 0
+            document.getElementById('firstTimeYes').onclick = function() { showSlide(1); }
+            document.getElementById('firstTimeNo').onclick = function() { showSlide(1); }
+
+
+            // Close slides modal
+            closeSlidesBtn.onclick = function() {
+                slidesModal.style.display = 'none';
+                waiverMainContainer.style.display = 'block';
+                // Reset to first slide when closing
+                showSlide(0); 
+            }
+
+            // Navigation functions exposed globally
+            window.nextSlide = function() {
+                showSlide(currentSlide + 1);
+            }
+
+            window.prevSlide = function() {
+                showSlide(currentSlide - 1);
+            }
+            
+            // Ensure the welcome screen is visible on load
+            document.getElementById('waiverWelcomeScreen').style.display = 'block';
+            
+            // Initialize slide navigation display
+            updateSlideProgress();
+        });
+    </script>
+</body>
+</html>

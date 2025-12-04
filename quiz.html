@@ -571,8 +571,8 @@
 
         <div class="progress-container">
             <div class="progress-info">
-                <span id="currentQ">Question 1 of 10</span>
-                <span id="scoreDisplay">Score: 0/10</span>
+                <span id="currentQ">Question 1 of 6</span>
+                <span id="scoreDisplay">Score: 0/6</span>
             </div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressBar"></div>
@@ -599,7 +599,7 @@
                     <span class="summary-value" id="percentage">0%</span>
                 </div>
             </div>
-            <button class="restart-btn" onclick="location.reload()">🔄 Take Quiz Again</button>
+            <a href="waiver-sign.html" class="restart-btn" style="text-decoration: none;">🔄 Sign Waiver Form</a>
         </div>
     </div>
 
@@ -615,16 +615,7 @@
                 correctMsg: "🎯 Correct! Pursuit OCR is strictly a 15+ facility. No exceptions!",
                 incorrectMsg: "❌ Incorrect! Pursuit OCR is strictly a 15+ facility. Anyone under 15 cannot participate."
             },
-            {
-                question: "Can guests under 18 visit alone without a parent or guardian?",
-                icon: "👨‍👩‍👧",
-                options: [
-                    { text: "Yes", icon: "✓", correct: false },
-                    { text: "No", icon: "✗", correct: true }
-                ],
-                correctMsg: "🎯 Correct! All guests under 18 MUST be accompanied by their parent or legal guardian.",
-                incorrectMsg: "❌ Incorrect! Guests under 18 must be accompanied by their parent or legal guardian at all times."
-            },
+            
             {
                 question: "Is there a ZERO TOLERANCE policy for alcohol and drugs?",
                 icon: "🚫",
@@ -645,36 +636,8 @@
                 correctMsg: "🎯 Correct! Only fully closed-toe, lace-up athletic shoes are permitted. Entry may be denied otherwise.",
                 incorrectMsg: "❌ Incorrect! Closed-toe, lace-up athletic shoes are MANDATORY. No slides, Crocs, or boots allowed!"
             },
-            {
-                question: "Can you get a refund within 72 hours of your appointment?",
-                icon: "💰",
-                options: [
-                    { text: "Yes", icon: "✓", correct: false },
-                    { text: "No", icon: "✗", correct: true }
-                ],
-                correctMsg: "🎯 Correct! All sales are final within 72 hours. No refunds during this timeframe.",
-                incorrectMsg: "❌ Incorrect! There are NO refunds within 72 hours of your scheduled appointment. All sales are final."
-            },
-            {
-                question: "Can participation result in serious injury or death?",
-                icon: "⚠️",
-                options: [
-                    { text: "Yes", icon: "✓", correct: true },
-                    { text: "No", icon: "✗", correct: false }
-                ],
-                correctMsg: "🎯 Correct! The waiver clearly states risks include fractures, brain damage, paralysis, and death.",
-                incorrectMsg: "❌ Incorrect! Participation involves serious risks including fractures, heart attack, brain damage, paralysis, and death."
-            },
-            {
-                question: "By signing, do you give up the right to sue for injuries?",
-                icon: "⚖️",
-                options: [
-                    { text: "Yes", icon: "✓", correct: true },
-                    { text: "No", icon: "✗", correct: false }
-                ],
-                correctMsg: "🎯 Correct! You waive the right to sue, even for injuries caused by negligence.",
-                incorrectMsg: "❌ Incorrect! By signing, you give up substantial rights including the right to sue for injuries, even from negligence."
-            },
+            
+            
             {
                 question: "Must all guests 18+ present government-issued photo ID?",
                 icon: "🪪",
@@ -685,16 +648,7 @@
                 correctMsg: "🎯 Correct! All guests 18+ must present matching government-issued photo ID.",
                 incorrectMsg: "❌ Incorrect! Government-issued photo ID is REQUIRED for all guests 18 and older."
             },
-            {
-                question: "Can Pursuit OCR use photos/videos of you for promotion?",
-                icon: "📸",
-                options: [
-                    { text: "Yes", icon: "✓", correct: true },
-                    { text: "No", icon: "✗", correct: false }
-                ],
-                correctMsg: "🎯 Correct! By signing, you grant unlimited permission to use your image for promotional purposes.",
-                incorrectMsg: "❌ Incorrect! The waiver grants unlimited permission to use photos/videos of you for promotion."
-            },
+            
             {
                 question: "Must you report ALL accidents/injuries, even minor ones?",
                 icon: "🚨",
